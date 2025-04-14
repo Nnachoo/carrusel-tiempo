@@ -1,0 +1,56 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Carrusel del tiempo en Extremadura</title>
+  <style>
+    body { font-family: sans-serif; background: #fff; text-align: center; padding: 20px; margin: 0; }
+    #weather-carousel { max-width: 600px; margin: auto; background: #f9f9f9; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); padding: 20px; }
+    #weather-content img { width: 60px; height: 60px; }
+    #weather-content h3 { margin: 10px 0 5px; font-size: 20px; }
+    #weather-content p { margin: 5px 0; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <div id="weather-carousel">
+    <h2>El tiempo en Extremadura</h2>
+    <div id="weather-content" style="min-height:150px;">Cargando...</div>
+  </div>
+
+  <script>
+    const cities = [
+      "Cáceres,ES", "Badajoz,ES", "Plasencia,ES", "Hervás,ES",
+      "Alcántara,ES", "Montánchez,ES", "Coria,ES",
+      "Valle de Santa Ana,ES", "Navalmoral de la Mata,ES"
+    ];
+    const API_KEY = "fc919298bbfa56382b8ef9521127b1b3";
+    let index = 0;
+
+    function fetchWeather(city) {
+      fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=es`)
+        .then(res => res.json())
+        .then(data => {
+          const html = `
+            <h3>${data.name}</h3>
+            <img src="https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png" alt="icono clima">
+            <p>${data.weather[0].description}</p>
+            <p><strong>${Math.round(data.main.temp)}°C</strong></p>
+          `;
+          document.getElementById("weather-content").innerHTML = html;
+        })
+        .catch(() => {
+          document.getElementById("weather-content").innerHTML = "<p>No se pudo cargar el tiempo.</p>";
+        });
+    }
+
+    function startCarousel() {
+      fetchWeather(cities[index]);
+      index = (index + 1) % cities.length;
+      setTimeout(startCarousel, 5000);
+    }
+
+    startCarousel();
+  </script>
+</body>
+</html>
